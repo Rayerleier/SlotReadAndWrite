@@ -1,66 +1,34 @@
-## Foundry
+# Question
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+重新修改 MyWallet 合约的 transferOwernship 和 auth 逻辑，使用内联汇编方式来 set和get `owner` 地址。
 
-Foundry consists of:
+```solidity
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+contract MyWallet { 
+    public string name;
+    private mapping (address => bool) approved;
+    public address owner;
 
-## Documentation
+    modifier auth {
+        require (msg.sender == owner, "Not authorized");
+        _;
+    }
 
-https://book.getfoundry.sh/
+    constructor(string _name) {
+        name = _name;
+        owner = msg.sender;
+    } 
 
-## Usage
-
-### Build
-
-```shell
-$ forge build
+    function transferOwernship(address _addr) auth {
+        require(_addr!=address(0), "New owner is the zero address");
+        require(owner != _addr, "New owner is the same as the old owner");
+        owner = _addr;
+    }
+}
 ```
 
-### Test
 
-```shell
-$ forge test
-```
 
-### Format
+# 运行截图
 
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+![image-20240516114533703](README.assets/image-20240516114533703.png)
